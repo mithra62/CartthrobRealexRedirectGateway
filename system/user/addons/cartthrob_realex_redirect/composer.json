@@ -1,0 +1,19 @@
+{
+  "name": "vendor_name/cartthrob_sample_gateway",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "CartThrob",
+      "email": "hello@cartthrob.com"
+    }
+  ],
+  "autoload": {
+    "classmap": [
+      "src/Cartthrob_realex_redirect.php"
+    ]
+  },
+  "require": {
+  }
+}
