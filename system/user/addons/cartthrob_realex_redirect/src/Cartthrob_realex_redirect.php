@@ -6,40 +6,50 @@ class Cartthrob_realex_redirect extends AbstractPaymentGateway
 {
     public $title = 'realex_redirect_title';
     public $overview = "realex_redirect_overview";
-    public $settings = array(
-        array(
+    public $settings = [
+        [
+            'name' => 'mode',
+            'short_name' => 'mode',
+            'type' => 'select',
+            'default' => 'test',
+            'options' => [
+                'test' => 'realex_mode_test',
+                'live' => 'realex_mode_live',
+            ],
+        ],
+        [
             'name' => 'realex_redirect_settings_merchant_id',
             'short_name' => 'your_merchant_id',
             'type' => 'text'
-        ),
-        array(
+        ],
+        [
             'name' => 'realex_redirect_settings_your_secret',
             'short_name' => 'your_secret',
             'type' => 'text'
-        ),
-        array(
+        ],
+        [
             'name' => 'realex_redirect_success_template',
             'short_name' => 'success_template',
             'type' => 'text',
             'note' => 'realex_backup_template_note',
-            'attributes' => array(
+            'attributes' => [
                 'class' => 'templates',
-            ),
-        ),
-        array(
+            ],
+        ],
+        [
             'name' => 'realex_redirect_failure_template',
             'short_name' => 'failure_template',
             'type' => 'text',
             'note' => 'realex_backup_template_note',
-            'attributes' => array(
+            'attributes' => [
                 'class' => 'templates',
-            ),
-        ),
-    );
+            ],
+        ],
+    ];
 
-    public $required_fields = array();
+    public $required_fields = [];
 
-    public $fields = array(
+    public $fields = [
         'first_name',
         'last_name',
         'address',
@@ -56,7 +66,7 @@ class Cartthrob_realex_redirect extends AbstractPaymentGateway
         'shipping_country_code',
         'phone',
         'email_address',
-    );
+    ];
 
     public function initialize()
     {
@@ -88,7 +98,7 @@ class Cartthrob_realex_redirect extends AbstractPaymentGateway
         $hash = $hash . "." . $this->plugin_settings('your_secret');
         $hash = sha1($hash);
 
-        $post_array = array(
+        $post_array = [
             'MERCHANT_ID' => $this->plugin_settings('your_merchant_id'),
             'ORDER_ID' => $this->order('order_id'),
             'CURRENCY' => $currency_code,
@@ -98,7 +108,7 @@ class Cartthrob_realex_redirect extends AbstractPaymentGateway
             'AUTO_SETTLE_FLAG' => 1,
             'CUST_NUM' => $this->order('member_id'),
             'ct_order_id' => $this->order('order_id'),
-        );
+        ];
 
         $this->gateway_exit_offsite($post_array, 'https://epage.payandshop.com/epage.cgi');
         exit;
@@ -106,26 +116,26 @@ class Cartthrob_realex_redirect extends AbstractPaymentGateway
 
     // END
 
-    function extload($post = array())
+    function extload($post = [])
     {
-        $auth = array(
-            'authorized' => FALSE,
-            'error_message' => NULL,
-            'failed' => TRUE,
-            'processing' => FALSE,
-            'declined' => FALSE,
-            'transaction_id' => NULL
-        );
+        $auth = [
+            'authorized' => false,
+            'error_message' => null,
+            'failed' => true,
+            'processing' => false,
+            'declined' => false,
+            'transaction_id' => null
+        ];
 
         $order_id = $this->xss_clean($this->arr($post, "ct_order_id"));
 
-        $xss_clean = TRUE;
+        $xss_clean = true;
 
         if (!$order_id) {
             die($this->lang('realex_order_id_not_specified'));
         }
 
-        $this->relaunch_cart(NULL, $order_id);
+        $this->relaunch_cart(null, $order_id);
 
         if (!isset($post['TIMESTAMP']) ||
             !isset($post['ORDER_ID']) ||
@@ -133,10 +143,10 @@ class Cartthrob_realex_redirect extends AbstractPaymentGateway
             !isset($post['MESSAGE']) ||
             !isset($post['PASREF']) ||
             !isset($post['AUTHCODE'])) {
-            $auth['authorized'] = FALSE;
-            $auth['declined'] = FALSE;
-            $auth['transaction_id'] = NULL;
-            $auth['failed'] = TRUE;
+            $auth['authorized'] = false;
+            $auth['declined'] = false;
+            $auth['transaction_id'] = null;
+            $auth['failed'] = true;
             $auth['error_message'] = $this->lang("realex_redirect_no_data_sent");
 
             $this->gateway_order_update($auth, $this->order('entry_id'), $return_url = NULL);
@@ -157,26 +167,26 @@ class Cartthrob_realex_redirect extends AbstractPaymentGateway
         $hash = sha1($hash);
 
         if ($hash != $post['SHA1HASH']) {
-            $auth['authorized'] = FALSE;
-            $auth['declined'] = FALSE;
-            $auth['transaction_id'] = NULL;
-            $auth['failed'] = TRUE;
+            $auth['authorized'] = false;
+            $auth['declined'] = false;
+            $auth['transaction_id'] = null;
+            $auth['failed'] = true;
             $auth['error_message'] = $this->lang('realex_redirect_hashes_dont_match');
 
 
         } elseif ($post['RESULT'] == "00") {
-            $auth['authorized'] = TRUE;
-            $auth['declined'] = FALSE;
+            $auth['authorized'] = true;
+            $auth['declined'] = false;
             $auth['transaction_id'] = $order_id;
-            $auth['failed'] = FALSE;
+            $auth['failed'] = false;
             $auth['error_message'] = '';
 
 
         } else {
-            $auth['authorized'] = FALSE;
-            $auth['declined'] = TRUE;
-            $auth['transaction_id'] = NULL;
-            $auth['failed'] = FALSE;
+            $auth['authorized'] = false;
+            $auth['declined'] = true;
+            $auth['transaction_id'] = null;
+            $auth['failed'] = false;
             $auth['error_message'] = $post['MESSAGE'];
 
 
@@ -184,7 +194,7 @@ class Cartthrob_realex_redirect extends AbstractPaymentGateway
 
 
         if (!$this->order('return')) {
-            $this->update_order(array('return' => $this->plugin_settings('order_complete_template')));
+            $this->update_order(['return' => $this->plugin_settings('order_complete_template')]);
         }
 
         $this->checkout_complete_offsite($auth, $order_id, 'template');
@@ -198,7 +208,7 @@ class Cartthrob_realex_redirect extends AbstractPaymentGateway
         if (isset($array[$key])) {
             return $array[$key];
         } else {
-            return NULL;
+            return null;
         }
     }
 }
