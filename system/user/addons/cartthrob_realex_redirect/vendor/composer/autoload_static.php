@@ -4,16 +4,17 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitc54fbda78fc43bb9f5a438e805f2e6e8
+class ComposerStaticInit4ad4959ce81b7b2e525f941600db5872
 {
     public static $classMap = array (
         'Cartthrob_realex_redirect' => __DIR__ . '/../..' . '/src/Cartthrob_realex_redirect.php',
+        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->classMap = ComposerStaticInitc54fbda78fc43bb9f5a438e805f2e6e8::$classMap;
+            $loader->classMap = ComposerStaticInit4ad4959ce81b7b2e525f941600db5872::$classMap;
 
         }, null, ClassLoader::class);
     }
