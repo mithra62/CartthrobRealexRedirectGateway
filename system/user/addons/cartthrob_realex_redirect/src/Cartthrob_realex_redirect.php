@@ -4,6 +4,9 @@ use CartThrob\PaymentGateways\AbstractPaymentGateway;
 
 class Cartthrob_realex_redirect extends AbstractPaymentGateway
 {
+    public const REALEX_LIVE_URL = 'https://epage.payandshop.com/epage.cgi';
+    public const REALEX_TEST_URL = 'https://pay.sandbox.realexpayments.com/pay';
+
     public $title = 'realex_redirect_title';
     public $overview = "realex_redirect_overview";
     public $settings = [
